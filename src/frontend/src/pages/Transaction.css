@@ -1,0 +1,24 @@
+.transaction-form {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  vertical-align: auto;
+  width: 100%;
+}
+
+.transaction-form ul {
+  text-decoration: none;
+  justify-self: center;
+  list-style-type: none;
+  text-align: center;
+  padding: 0%;
+  margin: 0%;
+  display: inline-block;
+}
+
+.transaction-form li {
+  text-decoration: none;
+  padding-top: 5%;
+  height: 50px;
+}

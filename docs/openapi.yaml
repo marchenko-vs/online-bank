@@ -1,0 +1,504 @@
+openapi: 3.0.1
+info:
+  title: API for online bank
+  description: Web API for future online bank
+  version: v1
+paths:
+  /accounts/me:
+    get:
+      tags:
+        - Accounts
+      responses:
+        '401':
+          description: Unauthorized user
+        '200':
+          description: OK
+  /accounts:
+    post:
+      tags:
+        - Accounts
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccountDtoPost'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/AccountDtoPost'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/AccountDtoPost'
+      responses:
+        '400':
+          description: Incorrect input data
+        '401':
+          description: Unauthorized user
+        '409':
+          description: Account already exists
+        '200':
+          description: OK
+  '/accounts/{accountId}/cards':
+    get:
+      tags:
+        - Cards
+      parameters:
+        - name: accountId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '401':
+          description: Unauthorized user
+        '200':
+          description: OK
+    post:
+      tags:
+        - Cards
+      parameters:
+        - name: accountId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CardDto'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/CardDto'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/CardDto'
+      responses:
+        '400':
+          description: Incorrect input data
+        '401':
+          description: Unauthorized user
+        '200':
+          description: OK
+  /transactions:
+    post:
+      tags:
+        - Transactions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactionDto'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/TransactionDto'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/TransactionDto'
+      responses:
+        '400':
+          description: Not enough money
+        '401':
+          description: Unauthorized user
+        '409':
+          description: Different currencies
+        '200':
+          description: OK
+  /users/me:
+    get:
+      tags:
+        - Users
+      responses:
+        '401':
+          description: Unauthorized user
+        '200':
+          description: OK
+    patch:
+      tags:
+        - Users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserDtoPatch'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/UserDtoPatch'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/UserDtoPatch'
+      responses:
+        '400':
+          description: Incorrect input data
+        '401':
+          description: Unauthorized user
+        '404':
+          description: User is not in database
+        '409':
+          description: Email is busy
+        '200':
+          description: OK
+  /users/login:
+    post:
+      tags:
+        - Users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserDtoLogin'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/UserDtoLogin'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/UserDtoLogin'
+      responses:
+        '400':
+          description: Incorrect input data
+        '404':
+          description: User is not in database
+        '200':
+          description: OK
+  /users:
+    post:
+      tags:
+        - Users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserDtoPost'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/UserDtoPost'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/UserDtoPost'
+      responses:
+        '400':
+          description: Incorrect input data
+        '409':
+          description: Email is busy
+        '200':
+          description: OK
+components:
+  schemas:
+    AccountDtoPost:
+      type: object
+      properties:
+        userId:
+          type: integer
+          format: int32
+          readOnly: true
+        number:
+          type: string
+          nullable: true
+          readOnly: true
+        issueDate:
+          type: string
+          format: date-time
+          readOnly: true
+        balance:
+          type: number
+          format: double
+          readOnly: true
+        currency:
+          type: string
+          default: RUB
+          nullable: true
+        status:
+          type: string
+          nullable: true
+          readOnly: true
+      additionalProperties: false
+    CardDto:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+          readOnly: true
+        accountId:
+          type: integer
+          format: int32
+          readOnly: true
+        paymentSystem:
+          type: string
+          default: VISA
+          nullable: true
+        number:
+          type: string
+          nullable: true
+          readOnly: true
+        issueDate:
+          type: string
+          format: date-time
+          readOnly: true
+        validityDate:
+          type: string
+          format: date-time
+          readOnly: true
+        cvv:
+          type: string
+          nullable: true
+          readOnly: true
+        balance:
+          type: number
+          format: double
+          readOnly: true
+        currency:
+          type: string
+          nullable: true
+          readOnly: true
+        status:
+          type: string
+          nullable: true
+          readOnly: true
+      additionalProperties: false
+    TransactionDto:
+      required:
+        - receiverNumber
+        - senderNumber
+        - sum
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+          readOnly: true
+        cardId:
+          type: integer
+          format: int32
+          readOnly: true
+        senderNumber:
+          minLength: 1
+          type: string
+          default: ''
+        receiverNumber:
+          minLength: 1
+          type: string
+          default: ''
+        sum:
+          type: number
+          format: double
+          default: 5000
+        currency:
+          type: string
+          nullable: true
+          readOnly: true
+        date:
+          type: string
+          format: date-time
+          readOnly: true
+        status:
+          type: string
+          nullable: true
+          readOnly: true
+      additionalProperties: false
+    UserDtoLogin:
+      required:
+        - email
+        - password
+      type: object
+      properties:
+        email:
+          minLength: 1
+          type: string
+          default: dykhal@mail.ru
+        password:
+          minLength: 1
+          type: string
+          default: '123456'
+      additionalProperties: false
+    UserDtoPatch:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+          readOnly: true
+        firstName:
+          type: string
+          default: 
+          nullable: true
+        lastName:
+          type: string
+          default: 
+          nullable: true
+        patronymic:
+          type: string
+          default: Романовна
+          nullable: true
+        birthDate:
+          type: string
+          format: date-time
+          default: '3000-01-01T00:00:00.000Z'
+        email:
+          type: string
+          default: 
+          nullable: true
+        phoneNum:
+          type: string
+          default: '+79998887766'
+          nullable: true
+        oldPassword:
+          type: string
+          default: '123456'
+          nullable: true
+        newPassword:
+          type: string
+          default: 
+          nullable: true
+        country:
+          type: string
+          default: 
+          nullable: true
+        region:
+          type: string
+          default: 
+          nullable: true
+        city:
+          type: string
+          default: Москва
+          nullable: true
+        addressLine1:
+          type: string
+          default: 
+          nullable: true
+        addressLine2:
+          type: string
+          default: корп. 1
+          nullable: true
+        postalCode:
+          type: string
+          default: 
+          nullable: true
+        idType:
+          type: string
+          default: 
+          nullable: true
+        idSeries:
+          type: string
+          default: '1234'
+          nullable: true
+        idNumber:
+          type: string
+          default: 
+          nullable: true
+        idIssueDate:
+          type: string
+          format: date-time
+          default: '3000-01-01T00:00:00.000Z'
+        idValidityDate:
+          type: string
+          format: date-time
+          default: '2030-01-01T00:00:00.000Z'
+        departmentCode:
+          type: string
+          default: 
+          nullable: true
+      additionalProperties: false
+    UserDtoPost:
+      required:
+        - addressLine1
+        - birthDate
+        - country
+        - departmentCode
+        - email
+        - firstName
+        - idIssueDate
+        - idNumber
+        - idType
+        - idValidityDate
+        - lastName
+        - password
+        - postalCode
+        - region
+      type: object
+      properties:
+        firstName:
+          minLength: 1
+          type: string
+          default: Полина
+        lastName:
+          minLength: 1
+          type: string
+          default: Дыхал
+        patronymic:
+          type: string
+          default: 
+          nullable: true
+        birthDate:
+          type: string
+          format: date-time
+          default: '2002-08-01T00:00:00.000Z'
+        email:
+          minLength: 1
+          type: string
+          default: dykhal@mail.ru
+        phoneNum:
+          type: string
+          default: 
+          nullable: true
+        password:
+          minLength: 1
+          type: string
+          default: '123456'
+        country:
+          minLength: 1
+          type: string
+          default: Российская Федерация
+        region:
+          minLength: 1
+          type: string
+          default: Московская область
+        city:
+          type: string
+          default: 
+          nullable: true
+        addressLine1:
+          minLength: 1
+          type: string
+          default: 'ул. Какая-то, д. 1, кв. 2'
+        addressLine2:
+          type: string
+          default: 
+          nullable: true
+        postalCode:
+          minLength: 1
+          type: string
+          default: '156723'
+        idType:
+          minLength: 1
+          type: string
+          default: Паспорт гражданина РФ
+        idSeries:
+          type: string
+          default: 
+          nullable: true
+        idNumber:
+          minLength: 1
+          type: string
+          default: '123456'
+        idIssueDate:
+          type: string
+          format: date-time
+          default: '2018-05-25T00:00:00.000Z'
+        idValidityDate:
+          type: string
+          format: date-time
+          default: '3000-01-01T00:00:00.000Z'
+        departmentCode:
+          minLength: 1
+          type: string
+          default: 123-456
+      additionalProperties: false
+  securitySchemes:
+    Bearer:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+security:
+  - Bearer: [ ]
