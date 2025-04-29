@@ -25,12 +25,23 @@ To run application execute following commands in PowerShell:
 > docker-compose up
 ```
 
+## docker-compose
+
+There are 8 Docker containers:
+
+- sql-server - RDBMS Microsoft SQL Server
+- init-db - creating database and tables if needed
+- backend - REST API
+- frontend - SPA
+- sqlpad - web-based SQL editor for managing database
+- nginx - redirecting all requests starting with /api/v1 to backend and all the others to frontend
+- prometheus - backend monitoring
+- grafana - visualizing data from prometheus
+
 ## Extras
 
 Here you can find [API specification](./docs/openapi.yaml) is Swagger format
 
-In directory /docs/ you can find documentation
+In directory /docs you can find documentation
 
-In directory /scripts/ you can find scripts for creating tables and roles in DB
-
-In directory /config/ you can find nginx configuration file for this project
+In directory /scripts you can find SQL-scripts for creating database, tables and roles
