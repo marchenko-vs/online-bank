@@ -1,0 +1,39 @@
+stages:
+  - build
+  - test
+  - deploy
+
+build-job:
+  stage: build
+  script:
+    - docker-compose build
+
+unit-test-job:
+  stage: test
+  script:
+    - echo "Unit test stage"
+
+integration-test-job:
+  stage: test
+  script:
+    - echo "Integration test stage"
+
+functional-test-job:
+  stage: test
+  script:
+    - echo "Functional test stage"
+
+api-test-job:
+  stage: test
+  script:
+    - echo "API test stage"
+
+e2e-test-job:
+  stage: test
+  script:
+    - echo "E2E test stage"
+
+deploy-job:
+  stage: deploy
+  script:
+    - docker-compose -p online-bank up -d

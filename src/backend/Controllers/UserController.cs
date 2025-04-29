@@ -14,6 +14,7 @@ namespace OnlineBank.Controllers
 {
     [ApiController]
     [Tags("Users")]
+    [Route("api/v1")]
     public class UserController : ControllerBase
     {
         private readonly ILogger<UserController> _logger;

@@ -6,6 +6,7 @@ using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using OnlineBank.Swagger;
 using Microsoft.Extensions.Options;
+using Prometheus;
 
 // builder
 var builder = WebApplication.CreateBuilder(args);
@@ -97,6 +98,9 @@ app.UseSwagger(options =>
 {
     options.SerializeAsV2 = true;
 });
+
+app.UseMetricServer();
+app.UseHttpMetrics();
 
 app.UseHttpsRedirection();
 

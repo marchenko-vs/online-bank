@@ -12,6 +12,7 @@ namespace OnlineBank.Controllers
 {
     [ApiController]
     [Tags("Cards")]
+    [Route("api/v1")]
     public class CardController : ControllerBase
     {
         private readonly ILogger<CardController> _logger;

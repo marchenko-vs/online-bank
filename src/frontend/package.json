@@ -49,5 +49,6 @@
     "globals": "^16.0.0",
     "jest": "^27.5.1",
     "typescript-eslint": "^8.24.1"
-  }
+  },
+  "proxy": "http://nginx:80"
 }
