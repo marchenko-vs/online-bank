@@ -14,7 +14,7 @@ export default class TransactionService {
   }
 
   public async sendMoney(postTransaction: PostTransaction): Promise<Response> {
-    return await fetch(`${this.baseUrl}/transactions`, {
+    return await fetch(`/api/v1/transactions`, {
       method: 'POST', 
       headers: { 
         'Authorization': `Bearer ${this.jwt}`,

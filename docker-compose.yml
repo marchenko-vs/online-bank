@@ -1,78 +1,115 @@
 services:
-  nginx:
-    image: byjg/nginx-extras:master
-    container_name: nginx
-    volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf
-      - ./nginx.crt:/usr/nginx.crt
-      - ./nginx.key:/usr/nginx.key
-      - ./static:/usr/static
-      - ./README.md:/usr/README.md
-    ports:
-      - 10080:80
-      - 10443:443
-    depends_on:
-      - backend-1
-    networks:
-      - app-network
   sql-server:
     container_name: sql-server
     image: mcr.microsoft.com/mssql/server:2022-latest
     environment:
       ACCEPT_EULA: "Y"
-      SA_PASSWORD: "pass1234PASS"
+      SA_PASSWORD: $DB_PASSWORD
     ports:
-      - 11433:1433
+      - "11433:1433"
+    volumes:
+      - sql-data:/var/opt/mssql
     networks:
       - app-network
-  backend-1:
+
+  init-db:
+    image: mcr.microsoft.com/mssql-tools
+    container_name: init-db
+    depends_on:
+      - sql-server
+    networks:
+      - app-network
+    entrypoint: >
+      /bin/bash -c "
+      sleep 60 &&
+      /opt/mssql-tools/bin/sqlcmd -S sql-server,1433 -U sa -P \"$DB_PASSWORD\" -C -i /scripts/create_db.sql &&
+      /opt/mssql-tools/bin/sqlcmd -S sql-server,1433 -U sa -P \"$DB_PASSWORD\" -C -i /scripts/create_tables.sql
+      "
+    volumes:
+      - ./scripts:/scripts
+  
+  backend:
     build: 
       context: ./src/backend/
       dockerfile: ./Dockerfile
-    container_name: backend-1
+    container_name: backend
     environment:
-      ASPNETCORE_URLS: "http://*:5000;https://*:5001"
-      ASPNETCORE_Kestrel__Certificates__Default__Password: "pass1234PASS"
-      ASPNETCORE_Kestrel__Certificates__Default__Path: /https/aspnetapp.pfx
+      ASPNETCORE_URLS: "http://*:5000"
+    depends_on:
+      - sql-server
     ports:
-      - 15000:5000
-      - 15001:5001
-    volumes:
-      - ./aspnetapp.pfx:/https/aspnetapp.pfx
+      - "15000:5000"
     networks:
       - app-network
+  
   frontend:
     build: 
       context: ./src/frontend/
       dockerfile: ./Dockerfile
     container_name: frontend
     ports:
-      - 23000:3000
+      - "23000:3000"
     networks:
       - app-network
+  
   sqlpad:
     image: sqlpad/sqlpad:5
     hostname: 'sqlpad'
-    container_name: dbadmin
+    container_name: sqlpad
     ports:
-      - 13000:3000
+      - "13000:3000"
     environment:
-      SQLPAD_ADMIN: 'dykhal@mail.ru'
-      SQLPAD_ADMIN_PASSWORD: 'admin'
+      SQLPAD_ADMIN: $SQLPAD_EMAIL
+      SQLPAD_ADMIN_PASSWORD: $SQLPAD_PASSWORD
       SQLPAD_APP_LOG_LEVEL: debug
       SQLPAD_WEB_LOG_LEVEL: warn
       SQLPAD_SEED_DATA_PATH: /etc/sqlpad/seed-data
-      SQLPAD_CONNECTIONS__pgdemo__name: Postgres demo
-      SQLPAD_CONNECTIONS__pgdemo__driver: postgres
-      SQLPAD_CONNECTIONS__pgdemo__host: postgres
-      SQLPAD_CONNECTIONS__pgdemo__database: sqlpad
-      SQLPAD_CONNECTIONS__pgdemo__username: sqlpad
-      SQLPAD_CONNECTIONS__pgdemo__password: sqlpad
-      SQLPAD_CONNECTIONS__pgdemo__multiStatementTransactionEnabled: 'true'
-      SQLPAD_CONNECTIONS__pgdemo__idleTimeoutSeconds: 86400
     networks:
       - app-network
+  
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+    ports:
+      - "30080:80"
+    depends_on:
+      - frontend
+      - backend
+    networks:
+      - app-network
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
+    ports:
+      - "9090:9090"
+    networks:
+      - app-network
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "43000:3000"
+    volumes:
+      - grafana-storage:/var/lib/grafana
+    networks:
+      - app-network
+    environment:
+      - GF_SECURITY_ADMIN_USER=$GRAFANA_USER
+      - GF_SECURITY_ADMIN_PASSWORD=$GRAFANA_PASSWORD
+
+volumes:
+  sql-data:
+  grafana-storage:
+  prometheus-data:
+
 networks:
   app-network:
-    name: app_network
+    name: app-network
     driver: bridge

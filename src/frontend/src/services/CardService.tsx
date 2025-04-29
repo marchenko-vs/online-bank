@@ -14,21 +14,21 @@ export default class CardService {
   }
 
   public async getCard(cardId: string): Promise<Response> {
-    return await fetch(`${this.baseUrl}/cards/${cardId}`, {
+    return await fetch(`/api/v1/cards/${cardId}`, {
       method: 'GET', 
       headers: { 'Authorization': `Bearer ${this.jwt}` },
     });
   }
 
   public async getCards(accountId: string): Promise<Response> {
-    return await fetch(`${this.baseUrl}/accounts/${accountId}/cards`, {
+    return await fetch(`/api/v1/accounts/${accountId}/cards`, {
       method: 'GET', 
       headers: { 'Authorization': `Bearer ${this.jwt}` },
     });
   }
 
   public async openCard(accountId: string, postCard: PostCard): Promise<Response> {
-    return await fetch(`${this.baseUrl}/accounts/${accountId}/cards`, {
+    return await fetch(`/api/v1/accounts/${accountId}/cards`, {
       method: 'POST', 
       headers: { 
         'Authorization': `Bearer ${this.jwt}`,

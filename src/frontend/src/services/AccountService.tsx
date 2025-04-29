@@ -14,14 +14,14 @@ export default class AccountService {
   }
 
   public async getAccounts(): Promise<Response> {
-    return await fetch(`${this.baseUrl}/accounts/me`, {
+    return await fetch(`/api/v1/accounts/me`, {
       method: 'GET', 
       headers: { 'Authorization': `Bearer ${this.jwt}` },
     });
   }
 
   public async openAccount(postAccount: PostAccount): Promise<Response> {
-    return await fetch(`${this.baseUrl}/accounts`, {
+    return await fetch(`/api/v1/accounts`, {
       method: 'POST', 
       headers: { 
         'Authorization': `Bearer ${this.jwt}`,

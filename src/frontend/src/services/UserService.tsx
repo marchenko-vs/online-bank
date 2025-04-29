@@ -14,7 +14,7 @@ export default class UserService {
   }
 
   public async login(loginUser: LoginUser): Promise<Response> {
-    return await fetch(`${this.baseUrl}/users/login`, {
+    return await fetch(`/api/v1/users/login`, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify(loginUser)
@@ -22,7 +22,7 @@ export default class UserService {
   }
 
   public async signup(postUser: PostUser): Promise<Response> {
-    return await fetch(`${this.baseUrl}/users`, {
+    return await fetch(`/api/v1/users`, {
       method: 'POST', 
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify(postUser)
@@ -30,14 +30,14 @@ export default class UserService {
   }
 
   public async getProfile(): Promise<Response> {
-    return await fetch(`${this.baseUrl}/users/me`, {
+    return await fetch(`/api/v1/users/me`, {
       method: 'GET',
       headers: { 'Authorization': `Bearer ${this.jwt}` }
     });
   }
 
   public async changeSettings(patchUser: PatchUser): Promise<Response> {
-    return await fetch(`${this.baseUrl}/users/me`, {
+    return await fetch(`/api/v1/users/me`, {
       method: 'PATCH', 
       headers: { 'content-type': 'application/json',
                  'Authorization': `Bearer ${this.jwt}` },
