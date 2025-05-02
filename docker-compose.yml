@@ -72,8 +72,10 @@ services:
     container_name: nginx
     volumes:
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - ./ssl:/etc/nginx/ssl
     ports:
-      - "30080:80"
+      - "1080:80"
+      - "1433:443"
     depends_on:
       - frontend
       - backend
